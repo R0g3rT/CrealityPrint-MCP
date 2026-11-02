@@ -1,4 +1,5 @@
 #include "AboutDialog.hpp"
+#include "RemoteAPI/ModVersion.hpp"
 #include "I18N.hpp"
 
 #include "libslic3r/Utils.hpp"
@@ -277,7 +278,7 @@ AboutDialog::AboutDialog()
 
     // version
     {
-        auto version_string = _L("Creality Print ") + " V" + std::string(CREALITYPRINT_VERSION) + " " + get_vertion_type();
+        auto version_string = _L("Creality Print ") + " V" + std::string(CREALITYPRINT_MOD_VERSION) + " " + get_vertion_type();
         wxStaticText* version_text = new wxStaticText(m_panel, wxID_ANY, version_string.c_str(), wxDefaultPosition, wxDefaultSize);
         version_text->SetFont(Label::Body_12);
         version_text->SetBackgroundColour(font_bg);
@@ -290,10 +291,15 @@ AboutDialog::AboutDialog()
     wxBoxSizer *text_sizer = new wxBoxSizer(wxVERTICAL);
     text_sizer_horiz->Add( 0, 0, 0, wxLEFT, FromDIP(0));
 
-    auto version_string = _L("Creality Print ") + " V" + std::string(CREALITYPRINT_VERSION);
+    auto version_string = _L("Creality Print ") + " V" + std::string(CREALITYPRINT_MOD_VERSION);
     std::vector<wxString> text_list;
     wxString pre_empty_space = "    ";
-    text_list.push_back(pre_empty_space + version_string + " " + _L("engine_copyright1"));
+    // Mod-Vermerk und Herkunft der Mod, danach Crealitys eigene Herkunftskette
+    text_list.push_back(pre_empty_space + version_string + " " + _L("is an unofficial mod of Creality Print V") + CREALITYPRINT_VERSION +
+                        " " + _L("with a Remote API for MCP (Model Context Protocol). Not an official Creality release."));
+    text_list.push_back(pre_empty_space + _L("The Remote API is ported from the OrcaSlicer MCP build by Max Ellis (github.com/maxellis/OrcaSlicer, AGPL-3.0); MCP server: orcaslicer-mcp by Max Ellis."));
+    text_list.push_back(pre_empty_space + _L("Mod maintained by R0g3rT. Licensed under AGPL-3.0 like Creality Print."));
+    text_list.push_back(pre_empty_space + _L("Creality Print ") + " V" + CREALITYPRINT_VERSION + " " + _L("engine_copyright1"));
     text_list.push_back(pre_empty_space + _L("engine_copyright2"));
     text_list.push_back(pre_empty_space + _L("engine_copyright3"));
     text_list.push_back(pre_empty_space + _L("engine_copyright4"));

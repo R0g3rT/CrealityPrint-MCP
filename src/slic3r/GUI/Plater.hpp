@@ -53,6 +53,7 @@ class SLAPrint;
 //BBS: add partplatelist and SlicingStatusEvent
 class PartPlateList;
 class SlicingStatusEvent;
+class SlicingProcessCompletedEvent;
 enum SLAPrintObjectStep : unsigned int;
 enum class ConversionType : int;
 class Ams;
@@ -100,6 +101,7 @@ enum class ActionButtonType : int;
 
 //BBS: add EVT_SLICING_UPDATE declare here
 wxDECLARE_EVENT(EVT_SLICING_UPDATE, Slic3r::SlicingStatusEvent);
+wxDECLARE_EVENT(EVT_PROCESS_COMPLETED, Slic3r::SlicingProcessCompletedEvent);
 wxDECLARE_EVENT(EVT_PUBLISH,        wxCommandEvent);
 wxDECLARE_EVENT(EVT_OPEN_PLATESETTINGSDIALOG,        wxCommandEvent);
 wxDECLARE_EVENT(EVT_PATHOLOGICAL_PROBE_REPAIR, wxCommandEvent);
@@ -580,6 +582,8 @@ public:
     void close_checked_3rd_filament_vendor_tip();
     void check_filament_vendor_for_models();
     void reslice();
+    void stop_background_slicing();
+    void reload_print(); // Remote API: G-Code-Vorschau neu laden
     void restore_belt_trans();
     void update_belt_trans();
     void add_belt_support();

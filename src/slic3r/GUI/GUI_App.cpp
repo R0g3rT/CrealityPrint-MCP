@@ -3,6 +3,10 @@
 #include "DataDirectoryVersion.hpp"
 #include "boost/filesystem/operations.hpp"
 #include "libslic3r/Technologies.hpp"
+// Asio-Header vor windows.h (kommt ueber GUI_App.hpp)
+#include "RemoteAPI/RemoteAPIServer.hpp"
+#include "RemoteAPI/RemoteAPIController.hpp"
+#include "RemoteAPI/ModVersion.hpp"
 #include "GUI_App.hpp"
 #include "BaseColorSpectraCache.hpp"
 #include "OfficialMaterialColorCache.hpp"
@@ -1393,7 +1397,7 @@ private:
             //title = wxGetApp().is_editor() ? SLIC3R_APP_FULL_NAME : GCODEVIEWER_APP_NAME;
 
             // dynamically get the version to display
-            version = GUI_App::format_display_version();
+            version = CREALITYPRINT_MOD_VERSION; // Mod-Version im Startbild (z. B. 7.3.1.0-mcp.1)
 
             // credits infornation
             credits = "";
@@ -2539,6 +2543,7 @@ void GUI_App::post_init()
            }
         }
     }
+    this->start_remote_api();
     BOOST_LOG_TRIVIAL(info) << "finished post_init";
     if (m_satisfaction_survey_manager) {
         m_satisfaction_survey_manager->begin_startup_check();
@@ -2614,6 +2619,7 @@ GUI_App::GUI_App(bool enable_test /*= false*/)
 	, m_other_instance_message_handler(std::make_unique<OtherInstanceMessageHandler>())
     , m_enable_test(enable_test)
 {
+    m_remote_api_server = std::make_unique<RemoteAPI::Server>();
 	//app config initializes early becasuse it is used in instance checking in CrealityPrint.cpp
     this->init_app_config();
     Test::Init(enable_test);
@@ -2635,6 +2641,7 @@ void GUI_App::shutdown()
 	if (m_removable_drive_manager) {
 		removable_drive_manager()->shutdown();
 	}
+    if (!m_is_recreating_gui) stop_remote_api();
 
     // destroy login dialog
     if (login_dlg != nullptr) {
@@ -6252,6 +6259,7 @@ void GUI_App::recreate_GUI(const wxString &msg_name)
 
     update_publish_status();
 
+    if (m_remote_api_controller) m_remote_api_controller->bind_plater_events();
     m_is_recreating_gui = false;
 
     BOOST_LOG_TRIVIAL(warning) << __FUNCTION__ << " end";
@@ -10164,6 +10172,10 @@ Semver get_version(const std::string& str, const std::regex& regexp) {
 }
 void GUI_App::check_new_version_cx(bool show_tips, int by_user)
 {
+    // Remote-API-Build: kein Selbst-Update, ein offizielles Update wuerde die Remote API entfernen
+    if (show_tips)
+        show_info(nullptr, _L("Updates are disabled in this Remote API build."), _L("Check for Update"));
+    return;
 #if defined(CREALITYPRINT_APP_STORE) && defined(__WXOSX__)
     (void)show_tips;
     (void)by_user;
@@ -12241,6 +12253,26 @@ void GUI_App::stop_sync_user_preset()
     }
 }
 
+RemoteAPI::Server &GUI_App::remote_api_server() { return *m_remote_api_server; }
+
+void GUI_App::start_remote_api()
+{
+    auto cfg = RemoteAPI::Config::load();
+    if (!cfg.enabled) return;
+    if (!m_remote_api_controller)
+        m_remote_api_controller = std::make_unique<RemoteAPI::Controller>();
+    m_remote_api_controller->bind_plater_events();
+    m_remote_api_server->set_handler([this](const RemoteAPI::Request &req) {
+        return m_remote_api_controller->dispatch(req);
+    });
+    m_remote_api_server->start(cfg);
+}
+
+void GUI_App::stop_remote_api()
+{
+    m_remote_api_server->stop();
+}
+
 void GUI_App::start_http_server()
 {
     if (!m_http_server.is_started())
@@ -12967,6 +12999,8 @@ void GUI_App::open_preferences(size_t open_on_tab, const std::string& highlight_
         // so we put it into an inner scope
         PreferencesDialog dlg(mainframe, open_on_tab, highlight_option);
         dlg.ShowModal();
+        stop_remote_api();
+        start_remote_api();
         this->plater_->get_current_canvas3D()->force_set_focus();
         // BBS
         //app_layout_changed = dlg.settings_layout_changed();

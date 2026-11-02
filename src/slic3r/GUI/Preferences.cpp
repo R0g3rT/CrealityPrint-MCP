@@ -1,4 +1,5 @@
 #include "Preferences.hpp"
+#include "RemoteAPI/RemoteAPIConfig.hpp"
 #include "OptionsGroup.hpp"
 #include "GUI_App.hpp"
 #include "slic3r/GUI/WebViewDialog.hpp"
@@ -1588,6 +1589,34 @@ wxWindow* PreferencesDialog::create_general_page()
     sizer_page->Add(item_save_presets, 0, wxTOP, FromDIP(3));
     sizer_page->AddSpacer(FromDIP(5));
     sizer_page->Add(item_save_choise, 0, wxTOP, FromDIP(3));
+
+    // Remote API (MCP): Ein/Aus, LAN-Freigabe, Token zum Kopieren.
+    // Gestartet/gestoppt wird beim Schliessen des Dialogs (GUI_App::open_preferences).
+    sizer_page->AddSpacer(FromDIP(10));
+    sizer_page->Add(create_item_title(_L("Remote API"), page, _L("Remote API")), 0, wxTOP | wxEXPAND, FromDIP(3));
+    sizer_page->Add(create_item_checkbox(_L("Enable Remote API"), page,
+        _L("Allow external tools (e.g. AI agents via MCP) to control Creality Print on this computer (port 13130)."),
+        50, "remote_api_enabled"), 0, wxTOP, FromDIP(3));
+    sizer_page->Add(create_item_checkbox(_L("Allow LAN access"), page,
+        _L("Off: only this computer (127.0.0.1). On: other devices in your network can connect with the token."),
+        50, "remote_api_bind_lan"), 0, wxTOP, FromDIP(3));
+    if (app_config->get("remote_api_token").empty()) {
+        app_config->set("remote_api_token", Slic3r::GUI::RemoteAPI::Config::generate_token());
+        app_config->save();
+    }
+    auto token_sizer = new wxBoxSizer(wxHORIZONTAL);
+    auto token_label = new wxStaticText(page, wxID_ANY, _L("API token"));
+    token_label->SetForegroundColour(DESIGN_GRAY900_COLOR);
+    auto token_value = new wxTextCtrl(page, wxID_ANY, wxString(app_config->get("remote_api_token")),
+                                      wxDefaultPosition, wxSize(FromDIP(260), -1), wxTE_READONLY);
+    token_sizer->AddSpacer(FromDIP(50));
+    token_sizer->Add(token_label, 0, wxALIGN_CENTER_VERTICAL);
+    token_sizer->Add(token_value, 0, wxALIGN_CENTER_VERTICAL | wxLEFT, FromDIP(5));
+    sizer_page->Add(token_sizer, 0, wxTOP, FromDIP(5));
+    // Protokollstufe: die Debug-Seite fehlt in oeffentlichen Builds, hier fuer die Fehlersuche
+    sizer_page->Add(create_item_loglevel_combobox(_L("Log Level"), page, _L("Log Level"),
+                        std::vector<wxString>{"fatal", "error", "warning", "info", "debug", "trace"}),
+                    0, wxTOP, FromDIP(5));
 
     page->SetSizer(sizer_page);
     page->Fit();

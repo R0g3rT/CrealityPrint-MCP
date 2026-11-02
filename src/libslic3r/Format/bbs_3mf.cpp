@@ -9849,6 +9849,15 @@ public:
         BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << " exit, and new interval is: " << m_interval;
     }
 
+    void defer_backup(long seconds) {
+        boost::lock_guard lock(m_mutex);
+        if (m_interval <= 0)
+            return;
+        auto not_before = boost::get_system_time() + boost::posix_time::seconds(seconds);
+        if (m_next_backup < not_before)
+            m_next_backup = not_before;
+    }
+
     void put_other_changes()
     {
         BOOST_LOG_TRIVIAL(info) << "put_other_changes";
@@ -10238,6 +10247,11 @@ void delete_object_mesh(ModelObject& object)
 void backup_soon()
 {
     _BBS_Backup_Manager::get().backup_soon();
+}
+
+void backup_defer(long seconds)
+{
+    _BBS_Backup_Manager::get().defer_backup(seconds);
 }
 
 void remove_backup(Model& model, bool removeAll)

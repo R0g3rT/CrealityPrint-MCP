@@ -1,6 +1,7 @@
 // #include "libslic3r/GCodeSender.hpp"
 //#include "slic3r/Utils/Serial.hpp"
 #include "Tab.hpp"
+#include "RemoteAPI/RemoteAPIController.hpp"
 #include "ParameterSwitchTrace.hpp"
 #include "PresetHints.hpp"
 #include "libslic3r/PresetBundle.hpp"
@@ -1869,6 +1870,7 @@ void Tab::on_roll_back_value(const bool to_sys /*= true*/)
 // comparing the selected preset config with $self->{config}.
 void Tab::update_dirty()
 {
+    Slic3r::GUI::RemoteAPI::Controller::notify_config_changed((int) m_type);
     if (m_postpone_update_ui)
         return;
 

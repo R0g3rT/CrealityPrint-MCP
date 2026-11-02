@@ -579,6 +579,14 @@ bool GCodeViewer::get_loaded()
 }
 
 
+void GCodeViewer::render_toolpaths_with_camera(const Camera&)
+{
+    // Creality-Renderer liest die Plater-Kamera, die der Aufrufer vorher umgesetzt hat
+    const auto& p_renderer = get_renderer();
+    if (p_renderer)
+        p_renderer->render_toolpaths_only();
+}
+
 const std::shared_ptr<BaseRenderer>& GCodeViewer::get_renderer() const
 {
     OpenGLManager& p_ogl_manager = wxGetApp().get_opengl_manager();

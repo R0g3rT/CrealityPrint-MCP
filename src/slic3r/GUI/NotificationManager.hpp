@@ -158,6 +158,7 @@ enum class NotificationType
 	SupportManualHint,
     // Filament vendor tip
     FilamentVendorTip,
+    RemoteAPIChange,
 };
 
 class NotificationManager

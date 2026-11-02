@@ -1,4 +1,5 @@
 #include "Plater.hpp"
+#include "RemoteAPI/RemoteAPIController.hpp"
 #include "libslic3r/RetractConfigTrace.hpp"
 #include "print_manage/PrinterBoxFilamentPanel.hpp"
 #include "slic3r/GUI/print_manage/Upload3mfToCloud.hpp"
@@ -9677,7 +9678,8 @@ std::vector<size_t> Plater::priv::load_files(const std::vector<fs::path>& input_
                 // convert_model_if(model, answer_convert_from_imperial_units == wxID_YES);
             }
 
-            if (!is_project_file && model.looks_like_multipart_object()) {
+            if (!is_project_file && model.looks_like_multipart_object()
+                && !RemoteAPI::Controller::api_ui_task_active()) {
                 MessageDialog msg_dlg(q,
                                       _L("This file contains several objects positioned at multiple heights.\n"
                                          "Instead of considering them as multiple objects, should \n"
@@ -17005,6 +17007,7 @@ void Plater::load_project(wxString const& filename2, wxString const& originfile)
 
     BOOST_LOG_TRIVIAL(info) << __FUNCTION__ << __LINE__ << " load project done";
     m_loading_project = false;
+    Slic3r::GUI::RemoteAPI::Controller::notify_project_opened();
 #ifdef _WIN32
     // 2.bltest next to slice
     {
@@ -25482,6 +25485,15 @@ void Plater::set_bed_position(Vec2d& pos) { p->bed.set_position(pos); }
 
 // BBS: is the background process slicing currently
 bool Plater::is_background_process_slicing() const { return p->m_is_slicing; }
+
+void Plater::reload_print() { p->preview->reload_print(); }
+
+void Plater::stop_background_slicing()
+{
+    if (p->background_process.running())
+        p->background_process.stop();
+    p->m_is_slicing = false;
+}
 
 bool Plater::cancel_background_slicing()
 {

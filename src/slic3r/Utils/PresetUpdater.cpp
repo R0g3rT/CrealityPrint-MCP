@@ -1230,6 +1230,10 @@ Updates PresetUpdater::priv::get_printer_config_updates(bool update) const
                 BOOST_LOG_TRIVIAL(warning) << boost::format("[CrealityPrint Updater]:resource version string '%1%' can not be parsed, will not skip update based on version") % resc_version;
         }
     }
+    // Ohne lesbare Ressourcen-Version (version.txt fehlt im oeffentlichen Quellcode)
+    // gibt es nichts zu aktualisieren - sonst wirft Semver("") beim Start.
+    if (!Semver::parse(resc_version))
+        return {};
     Updates updates;
     Version version;
     version.config_version = resc_version;

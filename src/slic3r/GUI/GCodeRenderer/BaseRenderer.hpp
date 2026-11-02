@@ -485,6 +485,8 @@ public:
     void render_all_plates_stats(const std::vector<const GCodeProcessorResult*>& gcode_result_list, bool show = true) const;
     //BBS: GUI refactor: add canvas width and height
     virtual void render(int canvas_width, int canvas_height);
+    // Remote API: nur Werkzeugwege zeichnen (ohne Legende/Slider)
+    void render_toolpaths_only() { render_toolpaths(); }
     
     bool has_data() const { return !m_roles.empty(); }
     virtual bool can_export_toolpaths() const = 0;

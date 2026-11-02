@@ -39,6 +39,8 @@ public:
     void set_shells_on_preview(bool is_previewing);
     void render_all_plates_stats(const std::vector<const GCodeProcessorResult*>& gcode_result_list, bool show = true) const;
     void render(int canvas_width, int canvas_height);
+    // Remote API: Werkzeugwege mit der (global gesetzten) Kamera zeichnen
+    void render_toolpaths_with_camera(const Camera& camera);
     // void _render_calibration_thumbnail_internal(ThumbnailData& thumbnail_data, const ThumbnailsParams& thumbnail_params,
     //                                             PartPlateList& partplate_list, OpenGLManager& opengl_manager);
     // void _render_calibration_thumbnail_framebuffer(ThumbnailData& thumbnail_data, unsigned int w, unsigned int h,

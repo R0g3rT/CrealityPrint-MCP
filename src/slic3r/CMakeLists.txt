@@ -490,6 +490,13 @@ set(SLIC3R_GUI_SOURCES
     GUI/DeviceImageProxy.cpp
     GUI/HttpServer.hpp
     GUI/HttpServer.cpp
+    GUI/RemoteAPI/RemoteAPIConfig.cpp
+    GUI/RemoteAPI/RemoteAPIConfig.hpp
+    GUI/RemoteAPI/RemoteAPIServer.cpp
+    GUI/RemoteAPI/RemoteAPIServer.hpp
+    GUI/RemoteAPI/RemoteAPIController.cpp
+    GUI/RemoteAPI/RemoteAPIController.hpp
+    GUI/RemoteAPI/ModVersion.hpp
     Config/Snapshot.cpp
     Config/Snapshot.hpp
     Config/Version.cpp

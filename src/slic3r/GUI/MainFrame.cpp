@@ -1,4 +1,5 @@
 #include "MainFrame.hpp"
+#include "RemoteAPI/RemoteAPIController.hpp"
 #include "ParameterSwitchTrace.hpp"
 
 #include <wx/colour.h>
@@ -607,9 +608,21 @@ MainFrame::MainFrame()
                 wxPostEvent(this, wxCommandEvent(EVT_BACKUP_POST));
             }
             else if (action == 1) {
+                // Remote API: kein Backup-Export waehrend einer API-Aktion
+                if (Slic3r::GUI::RemoteAPI::Controller::api_ui_task_active()) {
+                    Slic3r::backup_soon();
+                    return;
+                }
                 if (!m_plater->up_to_date(false, true)) {
                     trace.note("EXPORT_BEGIN");
-                    m_plater->export_3mf(m_plater->model().get_backup_path() + "/.3mf", SaveStrategy::Backup);
+                    Slic3r::GUI::RemoteAPI::Controller::set_backup_in_progress(true);
+                    try {
+                        m_plater->export_3mf(m_plater->model().get_backup_path() + "/.3mf", SaveStrategy::Backup);
+                    } catch (...) {
+                        Slic3r::GUI::RemoteAPI::Controller::set_backup_in_progress(false);
+                        throw;
+                    }
+                    Slic3r::GUI::RemoteAPI::Controller::set_backup_in_progress(false);
                     trace.note("EXPORT_END");
                     m_plater->up_to_date(true, true);
                 }

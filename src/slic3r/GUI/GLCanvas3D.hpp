@@ -1035,6 +1035,11 @@ public:
                                  bool                      for_picking  = false,
                                  bool                      ban_light    = false,
                                  const std::string&        view_type    = "iso");
+    // Remote API: Offscreen-Render von Platte bzw. G-Code-Vorschau
+    bool render_plate_thumbnail(ThumbnailData& thumbnail_data, unsigned int w, unsigned int h,
+                                const std::string& camera_view, bool frame_object);
+    bool render_gcode_thumbnail(ThumbnailData& thumbnail_data, unsigned int w, unsigned int h,
+                                const std::string& camera_view, bool frame_object);
     static void render_thumbnail_internal(ThumbnailData&            thumbnail_data,
                                           const ThumbnailsParams&   thumbnail_params,
                                           PartPlateList&            partplate_list,

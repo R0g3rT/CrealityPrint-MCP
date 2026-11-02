@@ -318,6 +318,8 @@ extern void delete_object_mesh(ModelObject& object);
 
 extern void backup_soon();
 
+extern void backup_defer(long seconds);
+
 extern void remove_backup(Model& model, bool removeAll);
 
 extern void set_backup_interval(long interval);

@@ -26677,3 +26677,30 @@ msgstr "Abgebrochen"
 
 #~ msgid "Export to Local"
 #~ msgstr "Export to Local"
+
+msgid "is an unofficial mod of Creality Print V"
+msgstr "ist eine inoffizielle Mod von Creality Print V"
+
+msgid "with a Remote API for MCP (Model Context Protocol). Not an official Creality release."
+msgstr "mit Remote API für MCP (Model Context Protocol). Keine offizielle Version von Creality."
+
+msgid "The Remote API is ported from the OrcaSlicer MCP build by Max Ellis (github.com/maxellis/OrcaSlicer, AGPL-3.0); MCP server: orcaslicer-mcp by Max Ellis."
+msgstr "Die Remote API ist portiert aus dem OrcaSlicer-MCP-Build von Max Ellis (github.com/maxellis/OrcaSlicer, AGPL-3.0); MCP-Server: orcaslicer-mcp von Max Ellis."
+
+msgid "Mod maintained by R0g3rT. Licensed under AGPL-3.0 like Creality Print."
+msgstr "Mod gepflegt von R0g3rT. Lizenz AGPL-3.0 wie Creality Print."
+
+msgid "Updates are disabled in this Remote API build."
+msgstr "Updates sind in diesem Remote-API-Build deaktiviert."
+
+msgid "Remote API"
+msgstr "Remote API"
+
+msgid "Enable Remote API"
+msgstr "Remote API aktivieren"
+
+msgid "Allow LAN access"
+msgstr "Zugriff aus dem LAN erlauben"
+
+msgid "API token"
+msgstr "API-Token"
