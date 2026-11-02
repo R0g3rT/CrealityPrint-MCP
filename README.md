@@ -1,213 +1,135 @@
-> ## Creality Print – MCP Mod (inoffiziell) · `7.3.1.0-mcp.1`
+# Creality Print – MCP Mod
+
+**Unofficial mod of Creality Print 7.3.1 with a built-in Remote API for MCP (Model Context Protocol).**
+Let an AI assistant such as Claude work directly in your running slicer: load models, change settings and
+profiles, slice, read the results and look at preview renders – every change is visible live in the GUI.
+
+> **Not an official Creality release** and not affiliated with Creality. Maintained by [R0g3rT](https://github.com/R0g3rT). License: AGPL-3.0.
 >
-> Diese Fassung ist eine **inoffizielle Mod** von Creality Print 7.3.1 mit eingebauter **Remote API für MCP**
-> (Model Context Protocol). Damit kann ein KI-Assistent wie Claude das laufende Programm steuern:
-> Modelle laden, Einstellungen und Profile ändern, slicen, Ergebnisse auswerten, Vorschaubilder abrufen.
-> **Keine offizielle Version von Creality.** Gepflegt von [R0g3rT](https://github.com/R0g3rT), Lizenz AGPL-3.0.
->
-> - **Download:** Installer und portable ZIP unter [Releases](../../releases)
-> - **Herkunft, Änderungen und Lizenzen:** [MOD_NOTICE.md](MOD_NOTICE.md)
-> - **Einrichtung:** Einstellungen → Allgemein → „Remote API“ aktivieren, Token kopieren; MCP-Server:
->   `uvx orcaslicer-mcp` mit Umgebungsvariable `ORCA_API_TOKEN=<Token>`
->
-> *English: Unofficial mod of Creality Print 7.3.1 adding a local, token-protected Remote API for MCP clients
-> (e.g. Claude). Not affiliated with Creality. See [MOD_NOTICE.md](MOD_NOTICE.md).*
+> 🇩🇪 **Deutsche Fassung:** [README.de.md](README.de.md)
+
+**Current version:** `7.3.1.0-mcp.1` (Creality Print 7.3.1.0 + mod release 1) · Windows x64
 
 ---
 
-# Creality Print 6.0  
-Creality Print 6.0 is an open source slicer for FDM printers.   [Offical Wiki](https://wiki.creality.com/en/software) 
+## What you can do with it
 
-# Join community
+Ask your assistant things like:
 
-<a href="https://discord.gg/agTqDNyJNY"><img src="https://img.shields.io/static/v1?message=Discord&logo=discord&label=&color=7289DA&logoColor=white&labelColor=&style=for-the-badge" height="35" alt="discord logo"/> </a>
+- *“Load `bracket.stl`, orient it for printing and slice it with 0.16 mm layers.”*
+- *“Which feature takes the most print time, and is any speed limited by the max. volumetric flow?”*
+- *“Show me the sliced preview from the top – where did the support go?”*
+- *“Put the second part on its own plate and slice both plates.”*
+- *“Check whether my profile is physically plausible before I save it.”*
 
-Welcome to join the Discord channel "creality-print-tester" and engage with us in discussions about everything related to Creality Print. Please follow the instructions below to help you find the "creality-print-tester" group.
+### Features
 
-If you are an interested developer, please follow these steps to join the Discord CP-GitHub-Develop channel.
+| Area | What works |
+|---|---|
+| Status | Active printer / process / filament presets, modified settings, slice state |
+| Settings | Read and change any setting live (atomic, invalid keys are rejected), per-object settings, variable layer height |
+| Presets | List, select, save, rename, delete, read stored preset values |
+| Models & plate | Load STL / OBJ / 3MF / STEP, list, move, rotate, scale, duplicate, delete, auto-arrange, auto-orient |
+| Multiple plates | Add, select, delete plates, move objects between plates |
+| Slicing | Slice and wait, cancel, warnings, G-code download |
+| Analysis | Print time and filament per feature (walls, infill, …), flow peaks and averages |
+| Images | PNG render of the plate before slicing and of the toolpath preview, 7 view angles |
 
-- Click the "Join Creality 3D" button.
-![alt text](Creality_doc/discord_step1.PNG)
-- At the 4th question select the “Invite by April” button.
-![alt text](Creality_doc/discord_step2.jpg)
-- Read and accept the rules in the **#rules** channel to to gain full server access and enable role selection.
+---
 
-<img width="1766" height="1238" alt="img_v3_02p3_99db2dd4-4eff-4b67-993b-35c643f0784g" src="https://github.com/user-attachments/assets/11ce826d-9441-49a6-9756-e3e60d84812c" />
+## Installation
 
-- Go to the #roles channel and react with the corresponding emoji to get the CP Developer role — this will grant you access to the channel.
-  
-<img width="1778" height="1264" alt="img_v3_02p3_43b5c52c-5eb8-4692-b2b2-641d0803989g" src="https://github.com/user-attachments/assets/e7dfa57f-c88a-4f7d-86f8-db32db69d794" />
+1. Download **`CrealityPrint_7.3.1.0-mcp.1_Setup.exe`** from [Releases](https://github.com/R0g3rT/CrealityPrint-MCP/releases) and run it.
+   Alternatively use the portable ZIP: unpack anywhere and start `CrealityPrint.exe`.
+2. The mod installs to `Program Files\Creality Print MCP Mod` with its own start-menu entry and uninstaller.
+   **An installed official Creality Print stays untouched** (separate folder, registry key and settings folder
+   `%APPDATA%\Creality\Creality Print\7.3 Alpha`; no file associations are changed).
 
-- The left navigation bar shows all channels, scroll down until you find "creality-print-tester"and"cp-github_developer"
+## Setup
 
-![img_v3_02p3_43c88f9d-53bf-45a1-a29f-9e3a77a4f33g](https://github.com/user-attachments/assets/3cf6f57b-79bf-45ec-8e48-ee79de437538)
+### 1. Enable the Remote API
 
-# Main features
-- Auto calibrations for all printers
-- Sandwich(inner-outer-inner) mode - an improved version of the `External perimeters first` mode
-- Polyholes conversion support [SuperSlicer Wiki: Polyholes](https://github.com/supermerill/SuperSlicer/wiki/Polyholes)
-- Klipper support
-- More granular controls
-- More features can be found in [change notes](https://github.com/CrealityOfficial/CrealityPrint/releases/)  
+In Creality Print: **Preferences → General → section “Remote API”**
 
+- Tick **Enable Remote API** and close the dialog (the server starts on `127.0.0.1:13130`).
+- Copy the **API token** shown there.
+- Leave **Allow LAN access** off unless another computer needs access.
 
-# Download
+### 2. Connect your MCP client
 
-### Stable Release
-📥 **[Download the Latest Stable Release](https://github.com/CrealityOfficial/CrealityPrint/releases/latest)**  
-Visit our GitHub Releases page for the latest stable version of Creality Print, recommended for most users.
+The MCP server is [orcaslicer-mcp](https://github.com/maxellis/orcaslicer-mcp) by Max Ellis – it works unchanged
+with this mod. It needs [uv](https://docs.astral.sh/uv/) (`winget install astral-sh.uv`).
 
+**Claude Desktop** – add to `%APPDATA%\Claude\claude_desktop_config.json`:
 
-
-# How to install
-**Windows**: 
-1.  Download the installer for your preferred version from the [releases page](https://github.com/CrealityOfficial/CrealityPrint/releases).
-    - *For convenience there is also a portable build available.*
-    - *If you have troubles to run the build, you might need to install following runtimes:*
-      - [MicrosoftEdgeWebView2RuntimeInstallerX64](https://github.com/SoftFever/OrcaSlicer/releases/download/v1.0.10-sf2/MicrosoftEdgeWebView2RuntimeInstallerX64.exe)
-          - [Details of this runtime](https://aka.ms/webview2)
-          - [Alternative Download Link Hosted by Microsoft](https://go.microsoft.com/fwlink/p/?LinkId=2124703)
-      - [vcredist2019_x64](https://github.com/SoftFever/OrcaSlicer/releases/download/v1.0.10-sf2/vcredist2019_x64.exe)
-          -  [Alternative Download Link Hosted by Microsoft](https://aka.ms/vs/17/release/vc_redist.x64.exe)
-          -  This file may already be available on your computer if you've installed visual studio.  Check the following location: `%VCINSTALLDIR%Redist\MSVC\v142`
-
-**Mac**:
-1. Download the DMG for your computer: `arm64` version for Apple Silicon and `x86_64` for Intel CPU.  
-2. Drag CrealityPrint.app to Application folder. 
-3. *If you want to run a build from a PR, you also need following instructions below*  
-    <details quarantine>
-    - Option 1 (You only need to do this once. After that the app can be opened normally.):
-      - Step 1: Hold _cmd_ and right click the app, from the context menu choose **Open**.
-      - Step 2: A warning window will pop up, click _Open_  
-      
-    - Option 2:  
-      Execute this command in terminal: `xattr -dr com.apple.quarantine /Applications/CrealityPrint.app`
-      ```console
-          softfever@mac:~$ xattr -dr com.apple.quarantine /Applications/CrealityPrint.app
-      ```
-    - Option 3:  
-        - Step 1: open the app, a warning window will pop up  
-            ![image](./SoftFever_doc/mac_cant_open.png)  
-        - Step 2: in `System Settings` -> `Privacy & Security`, click `Open Anyway`:  
-            ![image](./SoftFever_doc/mac_security_setting.png)  
-    </details>
-    
-**Linux(Ubuntu)**:
- 1. If you run into trouble to execute it, try this command in terminal:  
-    `chmod +x /path_to_appimage/CrealityPrint_Linux.AppImage`
-    
-# Command line slicing
-
-Creality Print can run slicing jobs from the command line without opening the normal GUI workflow. Use the `--slice` action with one or more input model/project files.
-
-```console
-CrealityPrint.exe --slice 0 --outputdir "C:\output" "C:\models\project.3mf"
+```json
+{
+  "mcpServers": {
+    "creality_print": {
+      "command": "uvx",
+      "args": ["orcaslicer-mcp"],
+      "env": { "ORCA_API_TOKEN": "<your token>" }
+    }
+  }
+}
 ```
 
-`--slice` selects which plate to slice:
+**Codex / other clients** – STDIO server, command `uvx`, argument `orcaslicer-mcp`,
+environment variable `ORCA_API_TOKEN=<your token>`.
 
-- `--slice 0`: slice all plates.
-- `--slice 1`: slice plate 1.
-- `--slice 2`: slice plate 2, and so on.
+Restart the client, start Creality Print, then ask: *“Which printer and profile are active in Creality Print?”*
 
-Useful options:
+### Quick check without AI
 
-- `--outputdir <dir>`: directory for generated G-code and CLI result files.
-- `--load_settings "<setting1.json;setting2.json>"`: load process/printer settings. This is usually needed when slicing STL/OBJ files that do not already contain project settings.
-- `--load_filaments "<filament1.json;filament2.json>"`: load filament settings.
-- `--debug <level>`: set log level. `0` is fatal only, `5` is trace.
-- `--logfile <file>`: write debug logs to a file.
-
-Examples:
-
-Slice all plates from a 3MF project:
-
-```console
-CrealityPrint.exe --slice 0 --outputdir "C:\output" "C:\models\example.3mf"
+```powershell
+curl.exe -H "X-Api-Token: <your token>" http://127.0.0.1:13130/api/v1/status
 ```
 
-Slice only the first plate and save a log:
+Without the token the API answers `401 unauthorized`.
 
-```console
-CrealityPrint.exe --slice 1 --outputdir "C:\output" --logfile "C:\output\slice.log" "C:\models\example.3mf"
-```
+---
 
-Slice an STL with external printer/process and filament presets:
+## Security
 
-```console
-CrealityPrint.exe --slice 0 --outputdir "C:\output" --load_settings "C:\presets\printer.json;C:\presets\process.json" --load_filaments "C:\presets\pla.json" "C:\models\part.stl"
-```
+- The Remote API is **off by default** and only listens on `127.0.0.1`.
+- Every request needs the token; regenerate it if it leaks.
+- With **LAN access** enabled, any device on your network that knows the token can control the slicer.
+- The API controls the **slicer** only – it never sends anything to your printer.
 
-Run `CrealityPrint.exe --help` to see the full list of supported command line options.
+## Differences from official Creality Print
 
-# How to compile
-- Windows 64-bit  
-  - Tools needed: Visual Studio 2019, Cmake, git, git-lfs, Strawberry Perl.
-      - You will require cmake version 3.14 or later, which is available [on their website](https://cmake.org/download/).
-      - Strawberry Perl is [available on their github repository](https://github.com/StrawberryPerl/Perl-Dist-Strawberry/releases/).
-  - Run `build_release.bat` in `x64 Native Tools Command Prompt for VS 2019`
-  - Note: Don't forget to run `git lfs pull` after cloning the repository to download tools on Windows
+- **No self-update:** an official update would remove the Remote API. Check this repository for new mod releases.
+- Version shows as `7.3.1.0-mcp.N`; splash screen and *About* dialog mark the build as a mod.
+- Log level can be changed in the *Remote API* section of the preferences.
+- Full list of changes, origins and licenses: **[MOD_NOTICE.md](MOD_NOTICE.md)**
 
-- Mac 64-bit  
-  - Tools needed: Xcode, Cmake, git, gettext, libtool, automake, autoconf, texinfo
-      - You can install most of them by running `brew install cmake gettext libtool automake autoconf texinfo`
-  - run `build_release_macos.sh`
-  - To build and debug in XCode:
-      - run `XCode.app`
-      - open ``build_`arch`/CrealityPrint.xcodeproj``
-      - menu bar: Product => Scheme => CrealityPrint
-      - menu bar: Product => Scheme => Edit Scheme...
-          - Run => Info tab => Build Configuration: `RelWithDebInfo`
-          - Run => Options tab => Document Versions: uncheck `Allow debugging when browsing versions`
-      - menu bar: Product => Run
+## Known limitations
 
-- Ubuntu 
-  - Dependencies **Will be auto installed with the shell script**: `libmspack-dev libgstreamerd-3-dev libsecret-1-dev libwebkit2gtk-4.0-dev libosmesa6-dev libssl-dev libcurl4-openssl-dev eglexternalplatform-dev libudev-dev libdbus-1-dev extra-cmake-modules libgtk2.0-dev libglew-dev libudev-dev libdbus-1-dev cmake git texinfo`
-  - run 'sudo ./BuildLinux.sh -u'
-  - run './BuildLinux.sh -dsir'
+- Windows x64 only (other platforms are not built or tested).
+- *Duplicate object* places the copy only slightly offset; use *arrange plate* afterwards.
+- Creality-specific features (Creality Cloud, CFS) are not exposed through the API.
 
+---
 
-# Note: 
-If you're running Klipper, it's recommended to add the following configuration to your `printer.cfg` file.
-```
-# Enable object exclusion
-[exclude_object]
+## Credits & lineage
 
-# Enable arcs support
-[gcode_arcs]
-resolution: 0.1
-```
+| Component | Source | License |
+|---|---|---|
+| Creality Print 7.3.1 (base) | [CrealityOfficial/CrealityPrint](https://github.com/CrealityOfficial/CrealityPrint) | AGPL-3.0 |
+| Remote API | OrcaSlicer MCP build by Max Ellis – [maxellis/OrcaSlicer](https://github.com/maxellis/OrcaSlicer) | AGPL-3.0 |
+| MCP server | [maxellis/orcaslicer-mcp](https://github.com/maxellis/orcaslicer-mcp) | AGPL-3.0 |
 
-# Supports
-**Creality Print** is an open-source project, and I'm deeply grateful to all my sponsors and backers.   
-Their generous support enables me to purchase filaments and other essential 3D printing materials for the project.   
-Thank you! :)
+Creality Print itself is based on OrcaSlicer and Ultimaker CuraEngine; OrcaSlicer is based on Bambu Studio,
+PrusaSlicer and SuperSlicer; PrusaSlicer originates from Slic3r by Alessandro Ranellucci and the RepRap community.
+Creality's original README: [README.creality.md](README.creality.md).
 
+## Building from source
 
+Branch `mcp-mod` = Creality Print `v7.3.1` + mod commits. Windows build: Visual Studio 2022 Build Tools
+(C++ workload, Windows SDK 10.0.22000), CMake 3.28/3.29 (not 4.x), Strawberry Perl, Git; then Creality's
+`test_build.bat deps` and `test_build.bat slicer`. Installer: NSIS with `package/mod/installer_mod.nsi`.
 
-## Some background
-Creality Print is originally forked from [Orca Slicer](https://github.com/SoftFever/OrcaSlicer) by SoftFever
-Orca Slicer is forked from [Bambu Studio](https://github.com/bambulab/BambuStudio) by Bambu
-Bambu Studio is forked from [PrusaSlicer](https://github.com/prusa3d/PrusaSlicer) by Prusa Research, which is from [Slic3r](https://github.com/Slic3r/Slic3r) by Alessandro Ranellucci and the RepRap community. 
-Creality Print incorporates a lot of features from SuperSlicer by @supermerill
-Creality Print's logo is designed by community member Justin Levine(@freejstnalxndr)  
+## License
 
-
-# License
-Creality Print is licensed under the GNU Affero General Public License, version 3. Creality Print is based on Orca Slicer by Orca Slicer.
-
-Orca Slicer is licensed under the GNU Affero General Public License, version 3. Creality Print is based on Bambu Studio by BambuLab.
-
-Bambu Studio is licensed under the GNU Affero General Public License, version 3. Bambu Studio is based on PrusaSlicer by PrusaResearch.
-
-PrusaSlicer is licensed under the GNU Affero General Public License, version 3. PrusaSlicer is owned by Prusa Research. PrusaSlicer is originally based on Slic3r by Alessandro Ranellucci.
-
-Slic3r is licensed under the GNU Affero General Public License, version 3. Slic3r was created by Alessandro Ranellucci with the help of many other contributors.
-
-The GNU Affero General Public License, version 3 ensures that if you use any part of this software in any way (even behind a web server), your software must be released under the same license.
-
-Creality Print includes a pressure advance calibration pattern test adapted from Andrew Ellis' generator, which is licensed under GNU General Public License, version 3. Ellis' generator is itself adapted from a generator developed by Sineos for Marlin, which is licensed under GNU General Public License, version 3.
-
-The bambu networking plugin is based on non-free libraries from Bambulab. It is optional to the Creality Print and provides extended functionalities for Bambulab printer users.
-
-test
+AGPL-3.0, same as Creality Print. Creality names and logos belong to Creality and are used only to identify the base
+of this unofficial mod.
