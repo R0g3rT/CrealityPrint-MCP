@@ -1,3 +1,20 @@
+> ## Creality Print – MCP Mod (inoffiziell) · `7.3.1.0-mcp.1`
+>
+> Diese Fassung ist eine **inoffizielle Mod** von Creality Print 7.3.1 mit eingebauter **Remote API für MCP**
+> (Model Context Protocol). Damit kann ein KI-Assistent wie Claude das laufende Programm steuern:
+> Modelle laden, Einstellungen und Profile ändern, slicen, Ergebnisse auswerten, Vorschaubilder abrufen.
+> **Keine offizielle Version von Creality.** Gepflegt von [R0g3rT](https://github.com/R0g3rT), Lizenz AGPL-3.0.
+>
+> - **Download:** Installer und portable ZIP unter [Releases](../../releases)
+> - **Herkunft, Änderungen und Lizenzen:** [MOD_NOTICE.md](MOD_NOTICE.md)
+> - **Einrichtung:** Einstellungen → Allgemein → „Remote API“ aktivieren, Token kopieren; MCP-Server:
+>   `uvx orcaslicer-mcp` mit Umgebungsvariable `ORCA_API_TOKEN=<Token>`
+>
+> *English: Unofficial mod of Creality Print 7.3.1 adding a local, token-protected Remote API for MCP clients
+> (e.g. Claude). Not affiliated with Creality. See [MOD_NOTICE.md](MOD_NOTICE.md).*
+
+---
+
 # Creality Print 6.0  
 Creality Print 6.0 is an open source slicer for FDM printers.   [Offical Wiki](https://wiki.creality.com/en/software) 
 
