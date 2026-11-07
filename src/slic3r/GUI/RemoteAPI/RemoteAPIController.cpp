@@ -2995,7 +2995,7 @@ Response Controller::handle_open_project(const std::string &body)
             AppConfigOverride save_choice("save_project_choise", "no");
             AppConfigOverride gcode_warn("no_warn_when_modified_gcodes", "true");
             AppConfigOverride printer_sync("sync_after_load_file_show_flag", "false");
-            plater->load_project(wpath, "<loadall>"); // "<loadall>": open as a project, no import-type dialog
+            plater->load_project(wpath, "-"); // Creality: "-" = normal als Projekt oeffnen (kein "<loadall>")
         }
 
         // load_project returns nothing; a file it could not read leaves the

@@ -258,6 +258,13 @@ sub("""    int status = result["errors"].empty() ? 200 : 422;
 }
 """)
 
+# 10) Projekt oeffnen: Orca kennt "<loadall>" als Sonderwert, Creality nicht. Creality behandelt jeden
+#     Wert ausser "-" und "<silence>" als Wiederherstellungsdatei (LoadStrategy::Restore) und laedt
+#     "<loadall>" als zweite Datei -> "Laden der Modelldatei fehlgeschlagen" (modaler Dialog, API haengt).
+#     "-" ist Crealitys Standard fuer Datei > Oeffnen.
+sub('plater->load_project(wpath, "<loadall>"); // "<loadall>": open as a project, no import-type dialog',
+    'plater->load_project(wpath, "-"); // Creality: "-" = normal als Projekt oeffnen (kein "<loadall>")')
+
 left = [l for l in t.splitlines() if re.search(r"Elegoo|ElegooCanvas|CanvasState|elegoo_canvas", l) and not l.lstrip().startswith("//")]
 if left:
     sys.exit("FEHLER: Elegoo-Reste:\n" + "\n".join(left[:10]))
