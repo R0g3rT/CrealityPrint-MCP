@@ -35,7 +35,7 @@ Frag deinen Assistenten zum Beispiel:
 | Auswertung | Druckzeit und Filament je Bereich (Wände, Füllung, …), Spitzen- und Durchschnittsfluss |
 | Bilder | PNG der Platte vor dem Slicen und der Werkzeugwege-Vorschau, 7 Blickwinkel |
 | Senden-Dialog | `set_config {"send_print_calibration": false}` stellt die Checkbox *Druckbettkalibrierung* im Senden-Dialog vor (`get_config` zeigt den aktuellen Wert) |
-| Projekte | Speichern, öffnen, zuletzt verwendete, neues Projekt, Projektdateien durchsuchen/verschieben (Löschen/Überschreiben nur mit zusätzlichem Schalter) |
+| Projekte | Speichern, öffnen, zuletzt verwendete, neues Projekt, Projektdateien durchsuchen/verschieben (Löschen/Überschreiben nur mit zusätzlichem Schalter) – braucht orcaslicer-mcp neuer als 0.1.19 (derzeit nur von GitHub) |
 
 ---
 

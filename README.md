@@ -35,7 +35,7 @@ Ask your assistant things like:
 | Analysis | Print time and filament per feature (walls, infill, …), flow peaks and averages |
 | Images | PNG render of the plate before slicing and of the toolpath preview, 7 view angles |
 | Send dialog | `set_config {"send_print_calibration": false}` presets the *bed calibration* checkbox of the Send dialog (`get_config` shows the current value) |
-| Projects | Save, open, recent projects, new project, browse/move project files (delete/overwrite only with an extra switch) |
+| Projects | Save, open, recent projects, new project, browse/move project files (delete/overwrite only with an extra switch) – needs orcaslicer-mcp newer than 0.1.19 (currently only from GitHub) |
 
 ---
 
