@@ -8,7 +8,7 @@ profiles, slice, read the results and look at preview renders – every change i
 >
 > 🇩🇪 **Deutsche Fassung:** [README.de.md](README.de.md)
 
-**Current version:** `7.3.1.0-mcp.1` (Creality Print 7.3.1.0 + mod release 1) · Windows x64
+**Current version:** `7.3.1.6378-mcp.2` (Creality Print 7.3.1.6378 + mod release 2) · Windows x64
 
 ---
 
@@ -34,12 +34,13 @@ Ask your assistant things like:
 | Slicing | Slice and wait, cancel, warnings, G-code download |
 | Analysis | Print time and filament per feature (walls, infill, …), flow peaks and averages |
 | Images | PNG render of the plate before slicing and of the toolpath preview, 7 view angles |
+| Projects | Save, open, recent projects, new project, browse/move project files (delete/overwrite only with an extra switch) |
 
 ---
 
 ## Installation
 
-1. Download **`CrealityPrint_7.3.1.0-mcp.1_Setup.exe`** from [Releases](https://github.com/R0g3rT/CrealityPrint-MCP/releases) and run it.
+1. Download **`CrealityPrint_7.3.1.6378-mcp.2_Setup.exe`** from [Releases](https://github.com/R0g3rT/CrealityPrint-MCP/releases) and run it.
    Alternatively use the portable ZIP: unpack anywhere and start `CrealityPrint.exe`.
 2. The mod installs to `Program Files\Creality Print MCP Mod` with its own start-menu entry and uninstaller.
    **An installed official Creality Print stays untouched** (separate folder, registry key and settings folder
@@ -99,14 +100,16 @@ Without the token the API answers `401 unauthorized`.
 ## Differences from official Creality Print
 
 - **No self-update:** an official update would remove the Remote API. Check this repository for new mod releases.
-- Version shows as `7.3.1.0-mcp.N`; splash screen and *About* dialog mark the build as a mod.
-- Log level can be changed in the *Remote API* section of the preferences.
+- Version shows as `7.3.1.6378-mcp.N`; splash screen and *About* dialog mark the build as a mod.
+- Log level and the *Allow deleting and replacing project files* switch (off by default) are in the *Remote API* section of the preferences.
 - Full list of changes, origins and licenses: **[MOD_NOTICE.md](MOD_NOTICE.md)**
 
 ## Known limitations
 
 - Windows x64 only (other platforms are not built or tested).
-- *Duplicate object* places the copy only slightly offset; use *arrange plate* afterwards.
+- *Duplicate object* places each copy next to the previous one (object width + 5 mm); use *arrange plate* if it runs off the bed.
+- Filament slots: the `get_printer_slots` / `*_slot_mapping` tools only work for Elegoo CANVAS in orcaslicer-mcp and report `not supported` here. Choose CFS slots and bed calibration in Creality Print's *Send* dialog.
+- The flow *prediction check* of orcaslicer-mcp is a rough estimate (speed × line width × layer height). Creality's actual flow can be higher, e.g. with Arachne variable line widths, gap fill or per-object overrides, so `anomaly` there is not necessarily a problem. The observed values (`observed_max_mm3_s`) come straight from the G-code and are reliable.
 - Creality-specific features (Creality Cloud, CFS) are not exposed through the API.
 
 ---

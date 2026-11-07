@@ -26704,3 +26704,9 @@ msgstr "Zugriff aus dem LAN erlauben"
 
 msgid "API token"
 msgstr "API-Token"
+
+msgid "Allow deleting and replacing project files"
+msgstr "Löschen und Überschreiben von Projektdateien erlauben"
+
+msgid "Off (recommended): the API can save, open and rename project files, but cannot delete a .3mf file or save or move a project over one that already exists. A deleted file does not go to the trash."
+msgstr "Aus (empfohlen): Die API kann Projektdateien speichern, öffnen und umbenennen, aber keine .3mf-Datei löschen oder ein Projekt über eine bestehende Datei speichern oder verschieben. Gelöschte Dateien landen nicht im Papierkorb."

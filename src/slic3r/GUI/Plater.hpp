@@ -824,6 +824,7 @@ public:
     void set_bed_position(Vec2d& pos);
     //BBS: is the background process slicing currently
     bool is_background_process_slicing() const;
+    bool is_loading_project() const { return m_loading_project; } // Remote API
     bool export_gcode_to_path(const fs::path& output_path, bool output_path_on_removable_media);
     bool cancel_background_slicing();
     //BBS: update slicing context

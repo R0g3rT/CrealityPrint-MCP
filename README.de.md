@@ -8,7 +8,7 @@ Ein KI-Assistent wie Claude arbeitet damit direkt im laufenden Slicer: Modelle l
 >
 > 🇬🇧 **English version:** [README.md](README.md)
 
-**Aktuelle Version:** `7.3.1.0-mcp.1` (Creality Print 7.3.1.0 + Mod-Stand 1) · Windows x64
+**Aktuelle Version:** `7.3.1.6378-mcp.2` (Creality Print 7.3.1.6378 + Mod-Stand 2) · Windows x64
 
 ---
 
@@ -34,12 +34,13 @@ Frag deinen Assistenten zum Beispiel:
 | Slicen | Slicen mit Warten, abbrechen, Warnungen, G-Code abrufen |
 | Auswertung | Druckzeit und Filament je Bereich (Wände, Füllung, …), Spitzen- und Durchschnittsfluss |
 | Bilder | PNG der Platte vor dem Slicen und der Werkzeugwege-Vorschau, 7 Blickwinkel |
+| Projekte | Speichern, öffnen, zuletzt verwendete, neues Projekt, Projektdateien durchsuchen/verschieben (Löschen/Überschreiben nur mit zusätzlichem Schalter) |
 
 ---
 
 ## Installation
 
-1. **`CrealityPrint_7.3.1.0-mcp.1_Setup.exe`** unter [Releases](https://github.com/R0g3rT/CrealityPrint-MCP/releases) herunterladen und ausführen.
+1. **`CrealityPrint_7.3.1.6378-mcp.2_Setup.exe`** unter [Releases](https://github.com/R0g3rT/CrealityPrint-MCP/releases) herunterladen und ausführen.
    Alternativ die portable ZIP: irgendwohin entpacken und `CrealityPrint.exe` starten.
 2. Die Mod wird nach `Programme\Creality Print MCP Mod` installiert, mit eigenem Startmenü-Eintrag und Deinstallation.
    **Ein installiertes offizielles Creality Print bleibt unverändert** (eigener Ordner, eigener Registry-Schlüssel,
@@ -99,14 +100,16 @@ Ohne Token antwortet die API mit `401 unauthorized`.
 ## Unterschiede zum offiziellen Creality Print
 
 - **Kein Selbst-Update:** Ein offizielles Update würde die Remote API entfernen. Neue Mod-Versionen gibt es hier im Repository.
-- Version wird als `7.3.1.0-mcp.N` angezeigt; Startbild und „Über“-Dialog kennzeichnen den Build als Mod.
-- Die Protokollstufe lässt sich im Abschnitt „Remote API“ der Einstellungen ändern.
+- Version wird als `7.3.1.6378-mcp.N` angezeigt; Startbild und „Über“-Dialog kennzeichnen den Build als Mod.
+- Protokollstufe und der Schalter „Löschen und Überschreiben von Projektdateien erlauben“ (standardmäßig aus) stehen im Abschnitt „Remote API“ der Einstellungen.
 - Vollständige Liste der Änderungen, Herkunft und Lizenzen: **[MOD_NOTICE.md](MOD_NOTICE.md)**
 
 ## Bekannte Einschränkungen
 
 - Nur Windows x64 (andere Plattformen werden nicht gebaut oder getestet).
-- *Objekt duplizieren* setzt die Kopie nur leicht versetzt; danach *Platte anordnen* nutzen.
+- *Objekt duplizieren* setzt jede Kopie neben die vorige (Objektbreite + 5 mm); läuft sie über die Platte hinaus, *Platte anordnen* nutzen.
+- Filament-Slots: Die Werkzeuge `get_printer_slots` / `*_slot_mapping` funktionieren in orcaslicer-mcp nur für Elegoo CANVAS und melden hier `not supported`. CFS-Slots und Bettkalibrierung wählst du im *Senden*-Dialog von Creality Print.
+- Die Flussvorhersage (*prediction check*) von orcaslicer-mcp ist eine grobe Schätzung (Geschwindigkeit × Linienbreite × Schichthöhe). Der tatsächliche Fluss in Creality kann höher liegen, z. B. durch variable Linienbreiten (Arachne), Lückenfüllung oder Einstellungen pro Objekt. `anomaly` ist dort also nicht automatisch ein Problem. Die gemessenen Werte (`observed_max_mm3_s`) stammen direkt aus dem G-Code und sind verlässlich.
 - Creality-spezifische Funktionen (Creality Cloud, CFS) sind über die API nicht erreichbar.
 
 ---

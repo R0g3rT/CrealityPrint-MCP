@@ -1600,6 +1600,12 @@ wxWindow* PreferencesDialog::create_general_page()
     sizer_page->Add(create_item_checkbox(_L("Allow LAN access"), page,
         _L("Off: only this computer (127.0.0.1). On: other devices in your network can connect with the token."),
         50, "remote_api_bind_lan"), 0, wxTOP, FromDIP(3));
+    // Vom Controller bei jedem Projektdatei-Aufruf gelesen (project_file_changes_allowed). Fehlt = aus.
+    sizer_page->Add(create_item_checkbox(_L("Allow deleting and replacing project files"), page,
+        _L("Off (recommended): the API can save, open and rename project files, but cannot delete a .3mf "
+           "file or save or move a project over one that already exists. A deleted file does not go to "
+           "the trash."),
+        50, "remote_api_allow_file_changes"), 0, wxTOP, FromDIP(3));
     if (app_config->get("remote_api_token").empty()) {
         app_config->set("remote_api_token", Slic3r::GUI::RemoteAPI::Config::generate_token());
         app_config->save();
