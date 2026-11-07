@@ -36,6 +36,7 @@ Herkunftskette von Creality Print selbst (laut Creality):
 - Creality-Anpassungen: Kamera-Blickwinkel, G-Code-Renderer, Preset-Auswahl, Zeit pro Druckbereich aus `roles_times`, Statusmeldung beim Laden der Vorschau
 - Einstellungen → Allgemein: Abschnitt „Remote API“ (Ein/Aus, LAN, Token, Protokollstufe, Schalter „Löschen und Überschreiben von Projektdateien erlauben“)
 - Remote-API-Controller wird mit `tools/mod/port_controller.py` aus dem aktuellen Orca-Controller erzeugt (Creality-Anpassungen per Skript, jede Ersetzung genau einmal); Elegoo-CANVAS-Slotfunktionen sind entfernt und melden `not supported`
+- Pseudo-Schlüssel `send_print_calibration` (0/1) für `get_config`/`set_config`: Vorgabe der Checkbox „Druckbettkalibrierung“ im Senden-Dialog (Crealitys `cache/send_to_printer/user_operation_state.json`)
 - Objekt duplizieren: Kopie mit Abstand (Objektbreite + 5 mm)
 - Selbst-Update deaktiviert (ein offizielles Update würde die Remote API entfernen)
 - Fix: fehlende `resources/printers/version.txt` im öffentlichen Quellcode führte zum Absturz beim Start

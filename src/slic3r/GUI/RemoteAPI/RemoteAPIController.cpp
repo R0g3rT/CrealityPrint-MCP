@@ -53,6 +53,8 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/nowide/fstream.hpp>
+#include "libslic3r/Utils.hpp" // data_dir()
 
 namespace Slic3r { namespace GUI { namespace RemoteAPI {
 
@@ -349,6 +351,65 @@ static std::string url_decode(const std::string &s)
     return out;
 }
 
+// --- MCP-Mod: Vorgabe Druckbettkalibrierung im Senden-Dialog -----------------------------
+static const char *MOD_SEND_CAL_KEY = "send_print_calibration";
+
+static boost::filesystem::path mod_send_state_path()
+{
+    return boost::filesystem::path(data_dir()) / "cache" / "send_to_printer" / "user_operation_state.json";
+}
+
+static nlohmann::json mod_read_send_state()
+{
+    try {
+        boost::nowide::ifstream in(mod_send_state_path().string());
+        if (in.is_open()) {
+            std::stringstream ss; ss << in.rdbuf();
+            auto j = nlohmann::json::parse(ss.str(), nullptr, false);
+            if (!j.is_discarded() && j.is_object()) return j;
+        }
+    } catch (...) {}
+    return nlohmann::json::object();
+}
+
+static int mod_get_send_calibration()
+{
+    auto j = mod_read_send_state();
+    if (!j.contains("print_calibration")) return 1; // Creality-Standard: an
+    const auto &v = j["print_calibration"];
+    if (v.is_boolean()) return v.get<bool>() ? 1 : 0;
+    if (v.is_number_integer()) return v.get<int>() == 1 ? 1 : 0;
+    return 0;
+}
+
+static bool mod_set_send_calibration(int on)
+{
+    try {
+        auto j = mod_read_send_state();
+        j["print_calibration"] = on ? 1 : 0;
+        const auto p = mod_send_state_path();
+        boost::filesystem::create_directories(p.parent_path());
+        boost::nowide::ofstream out(p.string(), std::ios::out | std::ios::trunc);
+        if (!out.is_open()) return false;
+        out << j.dump(-1, ' ', true);
+        return true;
+    } catch (...) { return false; }
+}
+
+// -1 = ungueltig
+static int mod_parse_on_off(const nlohmann::json &v)
+{
+    if (v.is_boolean()) return v.get<bool>() ? 1 : 0;
+    if (v.is_number_integer()) { auto n = v.get<long long>(); return n == 0 ? 0 : n == 1 ? 1 : -1; }
+    if (v.is_string()) {
+        std::string s = v.get<std::string>();
+        for (auto &c : s) c = (char) std::tolower((unsigned char) c);
+        if (s == "1" || s == "true" || s == "on") return 1;
+        if (s == "0" || s == "false" || s == "off") return 0;
+    }
+    return -1;
+}
+
 Response Controller::handle_get_config(const std::string &target)
 {
     // Optional filter: /api/v1/config?keys=layer_height,wall_loops
@@ -367,7 +428,10 @@ Response Controller::handle_get_config(const std::string &target)
     }
     nlohmann::json j = run_on_ui([keys = std::move(keys)]() -> nlohmann::json {
         DynamicPrintConfig cfg = wxGetApp().preset_bundle->full_config_secure();
-        return config_to_json(cfg, keys.empty() ? nullptr : &keys);
+        nlohmann::json out = config_to_json(cfg, keys.empty() ? nullptr : &keys);
+        if (keys.empty() || std::find(keys.begin(), keys.end(), MOD_SEND_CAL_KEY) != keys.end())
+            out[MOD_SEND_CAL_KEY] = std::to_string(mod_get_send_calibration());
+        return out;
     });
     return { 200, {{"config", j}} };
 }
@@ -677,6 +741,25 @@ Response Controller::handle_put_config(const std::string &body)
     if (!in.is_object())
         return { 400, {{"error", "body_must_be_object"}} };
 
+    // MCP-Mod: send_print_calibration ist keine Preset-Einstellung, sondern die Vorgabe der
+    // Checkbox "Druckbettkalibrierung" im Senden-Dialog. Atomar wie der Rest: erst nach
+    // fehlerfreiem Anwenden der uebrigen Schluessel schreiben.
+    int mod_cal = -2;
+    if (in.contains(MOD_SEND_CAL_KEY)) {
+        mod_cal = mod_parse_on_off(in[MOD_SEND_CAL_KEY]);
+        if (mod_cal < 0)
+            return { 422, {{"applied", nlohmann::json::array()},
+                           {"errors", {{MOD_SEND_CAL_KEY, "expected 0/1 or true/false"}}}} };
+        in.erase(MOD_SEND_CAL_KEY);
+        if (in.empty()) {
+            if (!mod_set_send_calibration(mod_cal))
+                return { 422, {{"applied", nlohmann::json::array()},
+                               {"errors", {{MOD_SEND_CAL_KEY, "could_not_write_send_dialog_state"}}}} };
+            return { 200, {{"applied", nlohmann::json::array({MOD_SEND_CAL_KEY})},
+                           {"errors", nlohmann::json::object()}}};
+        }
+    }
+
     // NOTE (Task 8 lesson applied): `in` is captured BY VALUE (moved) into the
     // run_on_ui lambda, never by reference. run_on_ui blocks the calling (io)
     // thread up to 10s via future.wait_for and THROWS on timeout without
@@ -941,6 +1024,12 @@ Response Controller::handle_put_config(const std::string &body)
         return {{"applied", applied}, {"errors", errors}};
     });
 
+    if (mod_cal >= 0 && result["errors"].empty()) {
+        if (mod_set_send_calibration(mod_cal))
+            result["applied"].push_back(MOD_SEND_CAL_KEY);
+        else
+            result["errors"][MOD_SEND_CAL_KEY] = "could_not_write_send_dialog_state";
+    }
     int status = result["errors"].empty() ? 200 : 422;
     return { status, result };
 }

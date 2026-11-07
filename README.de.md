@@ -34,6 +34,7 @@ Frag deinen Assistenten zum Beispiel:
 | Slicen | Slicen mit Warten, abbrechen, Warnungen, G-Code abrufen |
 | Auswertung | Druckzeit und Filament je Bereich (Wände, Füllung, …), Spitzen- und Durchschnittsfluss |
 | Bilder | PNG der Platte vor dem Slicen und der Werkzeugwege-Vorschau, 7 Blickwinkel |
+| Senden-Dialog | `set_config {"send_print_calibration": false}` stellt die Checkbox *Druckbettkalibrierung* im Senden-Dialog vor (`get_config` zeigt den aktuellen Wert) |
 | Projekte | Speichern, öffnen, zuletzt verwendete, neues Projekt, Projektdateien durchsuchen/verschieben (Löschen/Überschreiben nur mit zusätzlichem Schalter) |
 
 ---
@@ -108,7 +109,7 @@ Ohne Token antwortet die API mit `401 unauthorized`.
 
 - Nur Windows x64 (andere Plattformen werden nicht gebaut oder getestet).
 - *Objekt duplizieren* setzt jede Kopie neben die vorige (Objektbreite + 5 mm); läuft sie über die Platte hinaus, *Platte anordnen* nutzen.
-- Filament-Slots: Die Werkzeuge `get_printer_slots` / `*_slot_mapping` funktionieren in orcaslicer-mcp nur für Elegoo CANVAS und melden hier `not supported`. CFS-Slots und Bettkalibrierung wählst du im *Senden*-Dialog von Creality Print.
+- Filament-Slots: Die Werkzeuge `get_printer_slots` / `*_slot_mapping` funktionieren in orcaslicer-mcp nur für Elegoo CANVAS und melden hier `not supported`. CFS-Slots wählst du im *Senden*-Dialog von Creality Print.
 - Die Flussvorhersage (*prediction check*) von orcaslicer-mcp ist eine grobe Schätzung (Geschwindigkeit × Linienbreite × Schichthöhe). Der tatsächliche Fluss in Creality kann höher liegen, z. B. durch variable Linienbreiten (Arachne), Lückenfüllung oder Einstellungen pro Objekt. `anomaly` ist dort also nicht automatisch ein Problem. Die gemessenen Werte (`observed_max_mm3_s`) stammen direkt aus dem G-Code und sind verlässlich.
 - Creality-spezifische Funktionen (Creality Cloud, CFS) sind über die API nicht erreichbar.
 

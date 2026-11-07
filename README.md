@@ -34,6 +34,7 @@ Ask your assistant things like:
 | Slicing | Slice and wait, cancel, warnings, G-code download |
 | Analysis | Print time and filament per feature (walls, infill, …), flow peaks and averages |
 | Images | PNG render of the plate before slicing and of the toolpath preview, 7 view angles |
+| Send dialog | `set_config {"send_print_calibration": false}` presets the *bed calibration* checkbox of the Send dialog (`get_config` shows the current value) |
 | Projects | Save, open, recent projects, new project, browse/move project files (delete/overwrite only with an extra switch) |
 
 ---
@@ -108,7 +109,7 @@ Without the token the API answers `401 unauthorized`.
 
 - Windows x64 only (other platforms are not built or tested).
 - *Duplicate object* places each copy next to the previous one (object width + 5 mm); use *arrange plate* if it runs off the bed.
-- Filament slots: the `get_printer_slots` / `*_slot_mapping` tools only work for Elegoo CANVAS in orcaslicer-mcp and report `not supported` here. Choose CFS slots and bed calibration in Creality Print's *Send* dialog.
+- Filament slots: the `get_printer_slots` / `*_slot_mapping` tools only work for Elegoo CANVAS in orcaslicer-mcp and report `not supported` here. Choose CFS slots in Creality Print's *Send* dialog.
 - The flow *prediction check* of orcaslicer-mcp is a rough estimate (speed × line width × layer height). Creality's actual flow can be higher, e.g. with Arachne variable line widths, gap fill or per-object overrides, so `anomaly` there is not necessarily a problem. The observed values (`observed_max_mm3_s`) come straight from the G-code and are reliable.
 - Creality-specific features (Creality Cloud, CFS) are not exposed through the API.
 

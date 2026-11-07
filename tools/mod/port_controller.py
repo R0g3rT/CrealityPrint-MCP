@@ -134,6 +134,130 @@ Response Controller::handle_put_slot_mapping(const std::string &) { return { 200
 
 """ + t[j:]
 
+# 9) Senden-Dialog: Vorgabe "Druckbettkalibrierung" als Pseudo-Schluessel send_print_calibration.
+#    Creality merkt sich die Checkbox in data_dir()/cache/send_to_printer/user_operation_state.json
+#    (CxSentToPrinterDialog::load_user_operation_state); der Dialog liest sie beim Oeffnen.
+sub("#include <boost/filesystem.hpp>", "#include <boost/filesystem.hpp>\n#include <boost/nowide/fstream.hpp>\n#include \"libslic3r/Utils.hpp\" // data_dir()")
+sub("Response Controller::handle_get_config(const std::string &target)\n{",
+"""// --- MCP-Mod: Vorgabe Druckbettkalibrierung im Senden-Dialog -----------------------------
+static const char *MOD_SEND_CAL_KEY = "send_print_calibration";
+
+static boost::filesystem::path mod_send_state_path()
+{
+    return boost::filesystem::path(data_dir()) / "cache" / "send_to_printer" / "user_operation_state.json";
+}
+
+static nlohmann::json mod_read_send_state()
+{
+    try {
+        boost::nowide::ifstream in(mod_send_state_path().string());
+        if (in.is_open()) {
+            std::stringstream ss; ss << in.rdbuf();
+            auto j = nlohmann::json::parse(ss.str(), nullptr, false);
+            if (!j.is_discarded() && j.is_object()) return j;
+        }
+    } catch (...) {}
+    return nlohmann::json::object();
+}
+
+static int mod_get_send_calibration()
+{
+    auto j = mod_read_send_state();
+    if (!j.contains("print_calibration")) return 1; // Creality-Standard: an
+    const auto &v = j["print_calibration"];
+    if (v.is_boolean()) return v.get<bool>() ? 1 : 0;
+    if (v.is_number_integer()) return v.get<int>() == 1 ? 1 : 0;
+    return 0;
+}
+
+static bool mod_set_send_calibration(int on)
+{
+    try {
+        auto j = mod_read_send_state();
+        j["print_calibration"] = on ? 1 : 0;
+        const auto p = mod_send_state_path();
+        boost::filesystem::create_directories(p.parent_path());
+        boost::nowide::ofstream out(p.string(), std::ios::out | std::ios::trunc);
+        if (!out.is_open()) return false;
+        out << j.dump(-1, ' ', true);
+        return true;
+    } catch (...) { return false; }
+}
+
+// -1 = ungueltig
+static int mod_parse_on_off(const nlohmann::json &v)
+{
+    if (v.is_boolean()) return v.get<bool>() ? 1 : 0;
+    if (v.is_number_integer()) { auto n = v.get<long long>(); return n == 0 ? 0 : n == 1 ? 1 : -1; }
+    if (v.is_string()) {
+        std::string s = v.get<std::string>();
+        for (auto &c : s) c = (char) std::tolower((unsigned char) c);
+        if (s == "1" || s == "true" || s == "on") return 1;
+        if (s == "0" || s == "false" || s == "off") return 0;
+    }
+    return -1;
+}
+
+Response Controller::handle_get_config(const std::string &target)
+{""")
+sub("""        return config_to_json(cfg, keys.empty() ? nullptr : &keys);
+    });
+    return { 200, {{"config", j}} };""",
+"""        nlohmann::json out = config_to_json(cfg, keys.empty() ? nullptr : &keys);
+        if (keys.empty() || std::find(keys.begin(), keys.end(), MOD_SEND_CAL_KEY) != keys.end())
+            out[MOD_SEND_CAL_KEY] = std::to_string(mod_get_send_calibration());
+        return out;
+    });
+    return { 200, {{"config", j}} };""")
+sub("""Response Controller::handle_put_config(const std::string &body)
+{
+    // May throw nlohmann::json::parse_error - caught by the dispatch route
+    // below and turned into a 400, distinct from the generic 500 path.
+    nlohmann::json in = nlohmann::json::parse(body);
+    if (!in.is_object())
+        return { 400, {{"error", "body_must_be_object"}} };
+""",
+"""Response Controller::handle_put_config(const std::string &body)
+{
+    // May throw nlohmann::json::parse_error - caught by the dispatch route
+    // below and turned into a 400, distinct from the generic 500 path.
+    nlohmann::json in = nlohmann::json::parse(body);
+    if (!in.is_object())
+        return { 400, {{"error", "body_must_be_object"}} };
+
+    // MCP-Mod: send_print_calibration ist keine Preset-Einstellung, sondern die Vorgabe der
+    // Checkbox "Druckbettkalibrierung" im Senden-Dialog. Atomar wie der Rest: erst nach
+    // fehlerfreiem Anwenden der uebrigen Schluessel schreiben.
+    int mod_cal = -2;
+    if (in.contains(MOD_SEND_CAL_KEY)) {
+        mod_cal = mod_parse_on_off(in[MOD_SEND_CAL_KEY]);
+        if (mod_cal < 0)
+            return { 422, {{"applied", nlohmann::json::array()},
+                           {"errors", {{MOD_SEND_CAL_KEY, "expected 0/1 or true/false"}}}} };
+        in.erase(MOD_SEND_CAL_KEY);
+        if (in.empty()) {
+            if (!mod_set_send_calibration(mod_cal))
+                return { 422, {{"applied", nlohmann::json::array()},
+                               {"errors", {{MOD_SEND_CAL_KEY, "could_not_write_send_dialog_state"}}}} };
+            return { 200, {{"applied", nlohmann::json::array({MOD_SEND_CAL_KEY})},
+                           {"errors", nlohmann::json::object()}}};
+        }
+    }
+""")
+sub("""    int status = result["errors"].empty() ? 200 : 422;
+    return { status, result };
+}
+""", """    if (mod_cal >= 0 && result["errors"].empty()) {
+        if (mod_set_send_calibration(mod_cal))
+            result["applied"].push_back(MOD_SEND_CAL_KEY);
+        else
+            result["errors"][MOD_SEND_CAL_KEY] = "could_not_write_send_dialog_state";
+    }
+    int status = result["errors"].empty() ? 200 : 422;
+    return { status, result };
+}
+""")
+
 left = [l for l in t.splitlines() if re.search(r"Elegoo|ElegooCanvas|CanvasState|elegoo_canvas", l) and not l.lstrip().startswith("//")]
 if left:
     sys.exit("FEHLER: Elegoo-Reste:\n" + "\n".join(left[:10]))
